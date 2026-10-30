@@ -1,5 +1,5 @@
 /* Change VERSION whenever deploying changed assets. Local timesheets are never cached here. */
-const VERSION='weekly-shell-v1';
+const VERSION='weekly-shell-v2';
 const ASSETS=['./','./index.html','./styles.css','./app.mjs','./model.mjs','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./icon-maskable.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(ASSETS))));
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting();});

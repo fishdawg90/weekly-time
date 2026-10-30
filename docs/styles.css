@@ -3,3 +3,35 @@
 @media(max-width:850px){.app-shell{padding:0 24px}.tagline{display:none}.topbar{height:80px}.page-heading{padding:32px 0 25px}h1{font-size:30px}.week-total>span:first-child{font-size:38px}.toolbar-right{margin-left:auto}.local-note{margin-top:32px}.remove-row{opacity:1}}
 @media(max-width:580px){.app-shell{padding:0 14px}.topbar{height:68px;gap:8px}.brand{font-size:23px;gap:8px}.brand-icon{height:29px;width:29px;font-size:22px;border-radius:9px}.save-state{font-size:9px}.top-actions{gap:8px}.save-state i{display:none}.top-actions .button{padding:7px;font-size:10px}.tabs{margin-top:10px}.page-heading{padding-top:26px;align-items:flex-start;gap:12px}h1{font-size:26px;letter-spacing:-1px}.subtitle{font-size:11px;line-height:1.7;max-width:240px}.week-total>span:first-child{font-size:33px}.week-total>span:last-child{font-size:9px}.eyebrow{font-size:8px;letter-spacing:1.3px}.toolbar{gap:10px;margin-top:0}.toolbar-right{width:100%;justify-content:space-between;gap:8px}.button{padding:9px 11px;font-size:11px}.week-controls{width:100%}.week-controls #today{margin-left:auto}.date-label input{width:139px}.below-grid{flex-direction:column;font-size:9px}.local-note{align-items:flex-start;font-size:10px;line-height:1.6;justify-content:flex-start;gap:6px}.local-dot{flex-shrink:0;margin-top:5px}.footer-light{display:none}.project-tools{align-items:flex-start;flex-direction:column;gap:10px}.search-wrap{width:100%}.project-item{padding:16px;gap:12px}.project-actions{gap:10px}.project-item h3{font-size:12px}.project-item p{font-size:10px}.project-actions .text-button{font-size:10px}.add-row{padding:14px}.add-row select{min-width:0;font-size:11px}dialog{padding:22px}.field-pair{gap:10px}.page-heading>.button{font-size:10px;padding:9px}.empty-state{padding:24px 15px}.empty-state h2{font-size:16px}.empty-state p{font-size:11px}.row-project-select{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Compact edition: one navigation row, then straight into the grid. */
+.tabs{margin-top:0;gap:24px}.tab{padding:9px 1px 8px;font-size:12px}
+.compact-weekbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 10px;flex-wrap:wrap}
+.week-navigation,.week-tools{display:flex;align-items:center;gap:7px}.week-navigation{min-width:0}.week-tools{margin-left:auto}
+.week-title-control{position:relative;display:flex;align-items:center;gap:6px;border-radius:5px;padding:3px 5px;cursor:pointer}
+.week-title-control:hover{background:#eaf0e5}.week-title-control:focus-within{outline:2px solid var(--green);outline-offset:2px}
+.week-title-control h1{font-size:19px;font-weight:600;letter-spacing:-.55px;line-height:1.35;white-space:nowrap}
+.calendar-cue{color:#82927b;font-size:11px}.week-title-control input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:0}
+.week-title-control input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:auto;height:auto;cursor:pointer}
+.week-navigation .icon-button{height:27px;min-width:27px;font-size:14px;border-color:transparent}
+.compact-weekbar .button{padding:6px 9px;font-size:10px}.week-total{display:flex;flex-direction:row;align-items:baseline;gap:4px;white-space:nowrap;margin-right:6px}
+.week-total>span:first-child{font-size:20px;font-weight:600;letter-spacing:-.6px}.week-total>span:last-child{font-size:10px}
+#time-grid{min-width:590px}#time-grid thead th{height:38px;padding:8px 7px;font-size:9px}
+#time-grid thead th:first-child{padding-left:14px;width:32%;font-size:9px}#time-grid thead th.total-head{width:59px}
+#time-grid th.day-head span{display:inline;font-size:11px;margin-right:5px;margin-bottom:0}
+#time-grid tbody td{height:46px}#time-grid td.project-cell{padding:5px 20px 5px 13px}
+.row-project-select{font-size:12px;padding:1px 15px 1px 0;line-height:1.35}.project-codes{font-size:9px;margin:2px 0 0;padding-right:0;line-height:1.3}
+.project-codes span{margin:0 3px}.remove-row{bottom:4px;right:5px;font-size:14px}
+.hour-input{height:45px;font-size:14px;border-radius:3px}.hour-input::placeholder{font-size:11px}.row-total{font-size:12px}
+#time-grid tfoot td{height:32px;font-size:11px}#time-grid tfoot td:first-child{padding-left:14px;font-size:10px}
+.add-row{padding:7px 13px;min-height:38px;gap:7px}.add-row select{padding:3px 0;font-size:11px}.add-plus{font-size:16px}.add-row .text-button{font-size:11px}
+.below-grid{margin-top:7px;font-size:9px}.local-note{justify-content:flex-start;margin:13px 0 12px;font-size:10px}.local-note .text-button{font-size:10px}
+footer{padding:10px 0 15px;font-size:10px}.empty-state{padding:13px 16px 14px}.empty-icon{display:none}.empty-state h2{font-size:14px;margin:0 0 5px}.empty-state p{font-size:11px;margin:0 0 9px}.empty-state .button{padding:6px 10px;font-size:11px}
+#projects-view .page-heading{padding:14px 0 12px}#projects-view h1{font-size:23px;letter-spacing:-.6px}#projects-view .page-heading .button{padding:7px 11px}
+.project-tools{margin-bottom:10px;gap:12px}.search-wrap{padding:5px 10px}.search-wrap>span{font-size:20px}.project-item{padding:11px 15px}.project-item h3{font-size:12px;margin-bottom:4px}.project-item p{font-size:10px}.project-list{margin-bottom:20px}
+@media(max-width:850px){.compact-weekbar{gap:8px}.week-title-control h1{font-size:18px}.week-tools{gap:5px}}
+@media(max-width:650px){.app-shell{padding:0 14px}.week-title-control h1{font-size:16px}.week-navigation{gap:3px}.compact-weekbar{padding:9px 0 8px;gap:7px}.week-tools{width:100%;justify-content:flex-end}.week-tools .week-total{margin-right:auto}.week-navigation .button{padding:5px 7px}.below-grid{gap:3px}.local-note{margin:11px 0;font-size:9px}.tabs{margin-top:0}.tab{padding:8px 1px}.project-tools{gap:8px}}
+
+/* Minimal chrome: navigation is the app header. */
+.tabs{margin-top:0;align-items:center;gap:22px}.tab{padding:10px 1px 9px}.nav-settings{margin-left:auto;height:28px;min-width:28px;border:0}.app-shell{padding-top:0}.compact-weekbar{padding:9px 0 8px}.grid-card{margin-bottom:0}main{padding-bottom:12px}
+@media(max-width:650px){.tabs{margin-top:0}.tab{padding:8px 1px}.compact-weekbar{padding:8px 0 7px}.nav-settings{height:28px;min-width:28px}}

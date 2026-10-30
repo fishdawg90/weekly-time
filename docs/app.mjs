@@ -26,7 +26,7 @@ function projectOption(p){return new Option(`${p.name} · ${p.code} / ${p.task}`
 function renderWeek(){
  const now=isoDate(new Date()),dates=days(week),rs=rows();
  const start=prettyDate(week,{day:'numeric',month:'short'}),end=prettyDate(dates[4],{day:'numeric',month:'short',year:'numeric'});
- $('week-title').textContent=`${start} – ${end}`;$('week-context').textContent=week===monday()?'YOUR WORKING WEEK':week>monday()?'A WEEK TO PLAN AHEAD':'A WEEK TO LOOK BACK ON';$('week-picker').value=week;$('today').disabled=week===monday();
+ $('week-title').textContent=`${start} – ${end}`;$('week-picker').value=week;$('today').disabled=week===monday();
  const hr=el('tr');hr.append(el('th','','PROJECT / TASK'));dates.forEach((date,i)=>{const th=el('th','day-head'+(date===now?' today':''));th.scope='col';th.append(el('span','',['Mon','Tue','Wed','Thu','Fri'][i]),document.createTextNode(prettyDate(date,{day:'numeric',month:'short'})));hr.append(th);});const totalHead=el('th','total-head','TOTAL');totalHead.scope='col';hr.append(totalHead);$('grid-head').replaceChildren(hr);
  const body=$('grid-body');body.replaceChildren();invalidCells.clear();
  for(const r of rs){const tr=el('tr');tr.dataset.row=r.id;const cell=el('td','project-cell');const select=el('select','row-project-select');select.setAttribute('aria-label',`Project for ${r.name} / ${r.task}`);
@@ -73,9 +73,9 @@ $('project-search').oninput=renderProjects;$('show-archived').onchange=renderPro
 for(const button of document.querySelectorAll('[data-close]'))button.onclick=()=>button.closest('dialog').close();
 function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type}));const a=el('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 function guardExport(){if(invalidCells.size){toast('Correct the highlighted hours before exporting.');return false;}return true;}
-function renderBackupInfo(){const label=data.lastBackup?prettyDate(data.lastBackup.slice(0,10),{day:'numeric',month:'short',year:'numeric'}):'not yet';$('last-backup').textContent='Last backup download: '+label;$('backup-hint').textContent=data.lastBackup?'Backup: '+label:'No backup yet';}
+function renderBackupInfo(){const label=data.lastBackup?prettyDate(data.lastBackup.slice(0,10),{day:'numeric',month:'short',year:'numeric'}):'not yet';$('last-backup').textContent='Last backup download: '+label;}
 function openSettings(){$('settings-dialog').showModal();renderBackupInfo();}
-$('settings').onclick=openSettings;$('backup-shortcut').onclick=openSettings;$('help').onclick=()=>$('help-dialog').showModal();
+$('settings').onclick=openSettings;$('help').onclick=()=>$('help-dialog').showModal();
 $('backup').onclick=()=>{if(!guardExport())return;if(storageBlocked&&storedRaw){download(`weekly-time-unreadable-${isoDate(new Date())}.json`,storedRaw,'application/json');toast('Original saved data downloaded without changes.');return;}const when=new Date().toISOString();const backup={...data,lastBackup:when};download(`weekly-time-backup-${when.slice(0,10)}.json`,JSON.stringify(backup,null,2),'application/json');data.lastBackup=when;save();renderBackupInfo();toast('Full backup downloaded. Keep it somewhere safe.');};
 $('restore').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;if(file.size>10*1024*1024){toast('That backup is too large (maximum 10 MB).');return;}try{const restored=validateData(JSON.parse(await file.text()));const count=Object.keys(restored.weeks).length;if(!await confirmAction('Replace this device’s timesheets?',`Restore ${restored.projects.length} projects and ${count} weeks from this backup? Current data will be replaced. Download a backup of your current data first if you want to keep it.`,'Restore backup'))return;
   // Write the validated candidate first so a failed restore cannot discard the in-memory data.
