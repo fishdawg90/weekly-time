@@ -1,6 +1,6 @@
 # Weekly
 
-A compact, installable weekly timesheet. Monday–Friday across the top; reusable project/task rows down the side. No backend, dependencies, accounts or analytics.
+A compact, installable weekly timesheet. Monday–Friday across the top; reusable project/task rows down the side. No backend, dependencies, accounts or analytics. Choose Daylight, Warm Paper or Night in Appearance; all UI colours are controlled by semantic tokens in `docs/themes.css`. Project and timesheet rows stay on one line with shortened text and full details on hover.
 
 ## Publish with GitHub Pages
 
@@ -19,6 +19,7 @@ Open the hosted HTTPS website in Edge or Chrome. Use the app's **Install app** b
 
 - The app opens on the current week. Add project/task records in **Projects**, then choose them in the timesheet dropdown.
 - Hours save immediately on each valid edit. Decimal comma and decimal point work. Each cell accepts blank or 0–24 hours, with up to two decimals. Daily and weekly totals update immediately.
+- Each project has a Type (Standard Pay, Annual Leave, Statutory Holiday, or a custom Type). Add Types from any Type dropdown or Appearance. Weekly rows store their own Type; change it directly on the row when needed.
 - Add an existing project-code/task-code pair and choose **Update existing** or **Cancel**. The pair is matched without case or surrounding whitespace.
 - Historical rows keep snapshots of their project name/codes. Library edits apply to new rows; use **Use updated library details** in an existing row's dropdown to update that row deliberately.
 - Archive projects to hide them from new rows without losing history.
@@ -29,31 +30,34 @@ Open the hosted HTTPS website in Edge or Chrome. Use the app's **Install app** b
 
 **Copy for Oracle** prepares one row per populated project/task pair in the selected week. Blank hours become zero. All-empty and all-zero rows are omitted.
 
-TSV columns are: `Project`, `Project code`, `Task`, followed by five ISO dates (Monday–Friday). JSON schema:
+TSV columns are: `Project`, `Project code`, `Task`, `Type`, followed by five ISO dates (Monday–Friday). JSON schema:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "weekStart": "2026-10-26",
   "dates": ["2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30"],
-  "rows": [{"projectName": "Example", "projectCode": "EXAMPLE", "taskCode": "TASK", "hours": [7.5, 0, 0, 0, 0]}]
+  "rows": [{"projectName": "Example", "projectCode": "EXAMPLE", "taskCode": "TASK", "type": "Standard Pay", "hours": [7.5, 0, 0, 0, 0]}]
 }
 ```
 
-This export is ready for a future timesheet-specific bookmarklet. The previous expenses proof of concept accepts a single project/task pair and does not yet import weekly files. Nothing is automatically submitted to Oracle.
+Download `docs/oracle-timesheet-bookmarks.html` using the link in the Oracle export dialog and import it through the browser bookmark manager. The new **Fill Oracle timesheet v3** bookmark supports both nine-column typed copies and older eight-column copies. It matches project + task + Type, uses safe blank rows for new combinations, waits at least three seconds for metadata changes, then verifies all weekday values twice. A same-code/task row with a different Type is left alone. The previous expenses proof of concept still accepts only one project/task pair. Nothing is automatically submitted to Oracle.
 
 ## Data and backups
 
 All user data is stored under the stable `weekly-time:data:v1` localStorage key. It remains across code updates on the **same origin and browser profile**. No data is uploaded to GitHub. Another computer, phone, browser profile or hosting origin has separate data.
 
+Schema-1 data is migrated in memory to schema 2, with all projects and historical rows defaulting to Standard Pay. IDs, codes, hours and weeks are preserved. Before the first new-format save, the original JSON is kept under `weekly-time:pre-type-migration:v1`; use **Download pre-update backup** in settings to retrieve it. Old backups can still be restored.
+
 Use **Backups and app settings → Download full backup** regularly. Restore validates the file and asks before replacing local data. Browser clearing, profile removal or device loss can remove the only local copy. Moving the app to another host requires backup/restore. The service worker only caches application assets, not user data. Browser storage is subject to the normal security and retention of your work computer.
 
 ## Updates and offline use
 
-Edit the files in `docs/` and push to `main`; GitHub Pages republishes them. Keep the URL and storage key stable. Increment `VERSION` in `docs/sw.js` whenever assets change. An update banner appears after the new service worker installs. After the first complete online load, supported browsers can open the cached app offline. Browser policies and storage availability can limit offline/install features.
+Edit the files in `docs/` and push to `main`; GitHub Pages republishes them. Keep the URL and storage key stable. Increment the release query in HTML asset URLs, the model import, worker registration, and `ASSETS`/`VERSION` in `docs/sw.js` together whenever assets change. Versioned URLs keep old service workers from combining incompatible JavaScript with new HTML. An update banner appears after the new service worker installs. After the first complete online load, supported browsers can open the cached app offline. Browser policies and storage availability can limit offline/install features.
 
 ## Development and verification
 
-Serve `docs/` through a static server. No build is needed. Run `npm test` (Node 18+). Tests cover week boundaries, hour validation, duplicate project keys, historical snapshots, backup validation and Oracle exports. Browser QA covers project creation, duplicate update, saving across reload, week reuse and export.
+Serve `docs/` through a static server. No build is needed. Run `npm test` (Node 18+). Tests cover week boundaries, hours, duplicate keys, history, backups, schema-1 migration, custom Types/themes, typed exports, the actual shipped bookmark parser/planner, and cached asset version consistency. Browser QA covers migration, old weeks, inline Type editing, theme persistence, custom Types, project creation and an end-to-end typed export/Oracle fixture with nested controls.
 
 Implementation: plain HTML/CSS/JavaScript, web app manifest and service worker. `docs/model.mjs` contains the independent data model and export contract.
+
