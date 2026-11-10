@@ -1,0 +1,7 @@
+import {empty,validate} from './model.mjs?v=2';
+export const DB='weekly-expenses-v1';
+let connection;
+export function db(){return connection||=new Promise((res,rej)=>{const q=indexedDB.open(DB,1);q.onupgradeneeded=()=>{q.result.createObjectStore('meta');q.result.createObjectStore('files',{keyPath:'id'});};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
+export async function load(){const d=await db();return new Promise((res,rej)=>{const q=d.transaction('meta').objectStore('meta').get('state');q.onsuccess=()=>res(q.result?validate(q.result):empty());q.onerror=()=>rej(q.error);});}
+export async function file(id){const d=await db();return new Promise((res,rej)=>{const q=d.transaction('files').objectStore('files').get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
+export async function write(state,files=[]){const d=await db();return new Promise((res,rej)=>{const tx=d.transaction(['meta','files'],'readwrite');const store=tx.objectStore('meta');let conflict=false;const q=store.get('state');q.onsuccess=()=>{if(q.result&&q.result.revision!==state.revision){conflict=true;tx.abort();return;}const next={...state,revision:state.revision+1};store.put(next,'state');for(const f of files)tx.objectStore('files').put(f);};tx.oncomplete=()=>{state.revision++;res();};tx.onabort=tx.onerror=()=>rej(Error(conflict?'Another window changed Expenses. Reload this page before continuing.':tx.error?.message||'Could not save on this device. Export a backup and check available space.'));});}

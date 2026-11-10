@@ -61,3 +61,17 @@ Serve `docs/` through a static server. No build is needed. Run `npm test` (Node 
 
 Implementation: plain HTML/CSS/JavaScript, web app manifest and service worker. `docs/model.mjs` contains the independent data model and export contract.
 
+
+## Expenses
+
+A separate installable app is available at **[Expenses](https://fishdawg90.github.io/weekly-time/expenses/)**. Source is in `docs/expenses/`; it uses a separate IndexedDB database and service worker scope. Timesheet storage is unchanged.
+
+- Create arbitrary claim groups; capture photos, images, PDFs or pasted email/SMS text. Capture can remain incomplete.
+- Crop and rotate photos, switch colour/greyscale/black-and-white, and adjust brightness, contrast and ink threshold. Original files are retained; edited images are separate JPEGs.
+- Review receipt and details together; completion requires valid date, positive amount, currency, exact Oracle reference, description and evidence (or an explicit no-receipt flag), plus a manual check.
+- Install once online to cache the app for offline use. Android share-target support receives files/text into Inbox when supported by the originating app.
+- Local-only data does not automatically sync between phone and PC. Export full backups regularly. A group ZIP contains numbered original/enhanced evidence, summary.html, summary.tsv, oracle.txt and restore.json. Extract restore.json and import it on another device. Existing expense IDs are never silently overwritten.
+- Share the ZIP through the native share sheet if supported, or download and attach it manually to email. Sending is always manual. No automatic email forwarding, OCR/LLM extraction or cloud storage is configured.
+- The separate Oracle expense bookmark can be dragged from the pack dialog. Calibrate Date, Amount and Reference on the same Oracle row, with optional Currency/Description. It only fills blank dated/valued rows, waits three seconds after changes and verifies twice. Exact compatibility with a particular Oracle layout needs live calibration; project allocation and Save/Submit remain manual. Native PDF preview varies by browser; download original is also available.
+
+`npm test` includes expense validation, backup merge, currency totals, crop/filter, ZIP and offline-shell checks. Keep all expense runtime query versions and its service-worker cache name in sync when releasing asset updates. `bookmark-source.js` is the readable source for the URL encoded in `oracle-bookmark.mjs`.
