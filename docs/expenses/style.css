@@ -20,3 +20,7 @@
 #crop-canvas{touch-action:none}
 .image-dialog .crop-buttons{margin-top:7px}
 .image-dialog .small{line-height:1.5}
+
+.crop-view-tabs{display:flex;gap:6px;margin:0 0 10px;padding:4px;border:1px solid var(--line);border-radius:10px;background:#f4f7f0}
+.crop-view-tabs .chip{flex:1;min-height:44px;font-size:12px}
+.crop-view-tabs .chip.active{background:white;box-shadow:0 1px 5px #203d3714}

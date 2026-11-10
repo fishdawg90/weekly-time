@@ -35,3 +35,11 @@ test('pinch zoom follows the midpoint and clamps magnification without changing 
  assert.equal(zoomAt(view,g,{x:200,y:200},99).zoom,6);
  assert.equal(zoomAt(view,g,{x:200,y:200},.1).zoom,1);
 });
+test('preview uses the same warp as saving while allowing a smaller raster',()=>{
+ const data=new Uint8ClampedArray(11*11*4);
+ for(let y=0;y<11;y++)for(let x=0;x<11;x++)data.set([x*20,y*20,0,255],(y*11+x)*4);
+ const source={width:11,height:11,data},q=[{x:.2,y:.1},{x:.8,y:.2},{x:.9,y:.9},{x:.1,y:.8}],preview=rectifyPixels(source,q,5),saved=rectifyPixels(source,q);
+ assert(Math.max(preview.width,preview.height)<=5);assert(saved.height>preview.height);
+ const corners=r=>[0,r.width-1,r.width*r.height-1,(r.height-1)*r.width].map(i=>[...r.data.slice(i*4,i*4+4)]);
+ assert.deepEqual(corners(preview),corners(saved));
+});

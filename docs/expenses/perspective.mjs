@@ -35,14 +35,14 @@ export function quadMatrix(q){
  return [p1.x-p0.x+g*p1.x,p3.x-p0.x+h*p3.x,p0.x,p1.y-p0.y+g*p1.y,p3.y-p0.y+h*p3.y,p0.y,g,h];
 }
 export function project(m,u,v){const d=m[6]*u+m[7]*v+1;return {x:(m[0]*u+m[1]*v+m[2])/d,y:(m[3]*u+m[4]*v+m[5])/d};}
-export function outputSize(q,width,height){
+export function outputSize(q,width,height,maxDimension=2400){
  const len=(a,b)=>Math.hypot((a.x-b.x)*width,(a.y-b.y)*height);
- const w=Math.max(len(q[0],q[1]),len(q[3],q[2])),h=Math.max(len(q[0],q[3]),len(q[1],q[2])),scale=Math.min(1,2400/Math.max(w,h));
+ const w=Math.max(len(q[0],q[1]),len(q[3],q[2])),h=Math.max(len(q[0],q[3]),len(q[1],q[2])),scale=Math.min(1,maxDimension/Math.max(w,h));
  return {width:Math.max(2,Math.round(w*scale)),height:Math.max(2,Math.round(h*scale))};
 }
-export function rectifyPixels(source,q){
+export function rectifyPixels(source,q,maxDimension=2400){
  if(!validQuad(q))throw Error('Place the four corners around your receipt.');
- const {width,height}=outputSize(q,source.width,source.height),data=new Uint8ClampedArray(width*height*4),m=quadMatrix(q),sw=source.width,sh=source.height,src=source.data;
+ const {width,height}=outputSize(q,source.width,source.height,maxDimension),data=new Uint8ClampedArray(width*height*4),m=quadMatrix(q),sw=source.width,sh=source.height,src=source.data;
  for(let y=0;y<height;y++){const v=y/(height-1);
   for(let x=0;x<width;x++){const u=x/(width-1),d=m[6]*u+m[7]*v+1,sx=clamp((m[0]*u+m[1]*v+m[2])/d*(sw-1),0,sw-1),sy=clamp((m[3]*u+m[4]*v+m[5])/d*(sh-1),0,sh-1),ix=Math.floor(sx),iy=Math.floor(sy),fx=sx-ix,fy=sy-iy,a=(iy*sw+ix)*4,b=(iy*sw+Math.min(ix+1,sw-1))*4,c=(Math.min(iy+1,sh-1)*sw+ix)*4,e=(Math.min(iy+1,sh-1)*sw+Math.min(ix+1,sw-1))*4,out=(y*width+x)*4;
    for(let k=0;k<4;k++)data[out+k]=(src[a+k]*(1-fx)+src[b+k]*fx)*(1-fy)+(src[c+k]*(1-fx)+src[e+k]*fx)*fy;
