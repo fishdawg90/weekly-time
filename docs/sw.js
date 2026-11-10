@@ -1,6 +1,6 @@
 /* Change VERSION whenever deploying changed assets. Local timesheets are never cached here. */
-const VERSION='weekly-shell-v4';
-const ASSETS=['./','./index.html','./themes.css?v=4','./styles.css?v=4','./app.mjs?v=4','./model.mjs?v=4','./oracle-timesheet-bookmarks.html?v=4','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./icon-maskable.png'];
+const VERSION='weekly-shell-v5';
+const ASSETS=['./','./index.html','./themes.css?v=5','./styles.css?v=5','./app.mjs?v=5','./oracle-bookmark.mjs?v=5','./model.mjs?v=5','./oracle-timesheet-bookmarks.html?v=5','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./icon-maskable.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(ASSETS))));
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting();});
 self.addEventListener('activate',event=>event.waitUntil((async()=>{await Promise.all((await caches.keys()).filter(k=>k.startsWith('weekly-shell-')&&k!==VERSION).map(k=>caches.delete(k)));await self.clients.claim();})()));
