@@ -19,7 +19,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
  function updateEditorMode(){
   $('crop-adjust').ariaPressed=String(!previewing);$('crop-preview').ariaPressed=String(previewing);
   $('crop-adjust').classList.toggle('active',!previewing);$('crop-preview').classList.toggle('active',previewing);
-  $('crop-instructions').textContent=previewing?'Straightened preview — check the result before saving. Pinch or use + / − to inspect it. Switch to Adjust corners to refine the outline.':'Pinch to zoom. Drag each numbered corner onto the receipt; the magnifier helps you aim. Drag the image to pan when zoomed. Preview straightens the outline before you save.';
+  $('crop-instructions').textContent=previewing?'Straightened preview · Pinch to inspect':'Drag corners · Pinch to zoom';
  }
  function correctedImage(maxDimension){
   const source=filtered().getContext('2d').getImageData(0,0,working.width,working.height),result=rectifyPixels(source,quad,maxDimension),out=document.createElement('canvas');out.width=result.width;out.height=result.height;out.getContext('2d').putImageData(new ImageData(result.data,result.width,result.height),0,0);
@@ -125,7 +125,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
    const out=correctedImage(2400);
    const blob=await new Promise((resolve,reject)=>out.toBlob(b=>b?resolve(b):reject(Error('Could not create edited image.')),'image/jpeg',.94));
    await onSave(record,blob);dialog.close();
-  }catch(e){onError(e);}finally{button.disabled=false;button.textContent='Use this image ✓';}
+  }catch(e){onError(e);}finally{button.disabled=false;button.textContent='Save scan';}
  };
  new ResizeObserver(()=>{if(pointers.size){pointers.clear();pinch=null;drag=null;}schedule();}).observe(canvas.parentElement);
  return async f=>{
