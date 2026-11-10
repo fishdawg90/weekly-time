@@ -3,7 +3,7 @@ export const SCHEMA=2;
 export const STORE_KEY='weekly-time:data:v1';
 export const MIGRATION_KEY='weekly-time:pre-type-migration:v1';
 export const DEFAULT_TYPES=['Standard Pay','Annual Leave','Statutory Holiday'];
-export const THEMES=['daylight','paper','night'];
+export const THEMES=['daylight','paper','night','minimal'];
 export const uid=()=>globalThis.crypto?.randomUUID?.()||('id-'+Date.now()+'-'+Math.random().toString(36).slice(2));
 export function isoDate(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
 export function validDate(s){if(typeof s!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;const d=new Date(s+'T12:00:00');return !isNaN(d)&&isoDate(d)===s;}

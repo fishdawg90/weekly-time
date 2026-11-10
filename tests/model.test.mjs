@@ -14,3 +14,10 @@ test('Oracle export emits ordered weekdays, zero for blanks and skips empty rows
 test('legacy data migrates in memory without losing project IDs, historical details or hours',()=>{const old=fixture();old.schemaVersion=1;delete old.types;delete old.settings;delete old.projects[0].type;delete old.weeks['2026-10-26'].rows[0].type;old.revision=27;const before=JSON.stringify(old);const result=validateData(old);assert.equal(JSON.stringify(old),before);assert.equal(result.schemaVersion,2);assert.equal(result.revision,27);assert.equal(result.projects[0].id,old.projects[0].id);assert.deepEqual(result.weeks['2026-10-26'].rows[0].hours,old.weeks['2026-10-26'].rows[0].hours);assert.equal(result.projects[0].type,'Standard Pay');assert.equal(result.weeks['2026-10-26'].rows[0].type,'Standard Pay');});
 test('custom Types and themes survive backup, restore and snapshot creation',()=>{const d=fixture();d.types.push('Overtime');d.settings.theme='night';d.projects[0].type='Overtime';d.weeks['2026-10-26'].rows[0].type='Annual Leave';assert.deepEqual(validateData(JSON.parse(JSON.stringify(d))),d);assert.equal(snapshot(d.projects[0]).type,'Overtime');assert.equal(oraclePayload(d,'2026-10-26').rows[0].type,'Annual Leave');});
 test('legacy weekly rows default independently of library Type, malformed Types are rejected',()=>{const d=fixture();d.projects[0].type='Annual Leave';delete d.weeks['2026-10-26'].rows[0].type;assert.equal(validateData(d).weeks['2026-10-26'].rows[0].type,'Standard Pay');d.projects[0].type='bad\ttype';assert.throws(()=>validateData(d));});
+test('Minimal persists through validation and backup without changing existing hours',()=>{
+ const d=fixture();d.settings.theme='minimal';
+ const restored=validateData(JSON.parse(JSON.stringify(d)));
+ assert.equal(restored.settings.theme,'minimal');
+ assert.deepEqual(restored.projects,d.projects);assert.deepEqual(restored.weeks,d.weeks);
+ for(const theme of ['daylight','paper','night'])assert.equal(validateData({...d,settings:{theme}}).settings.theme,theme);
+});
