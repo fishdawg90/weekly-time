@@ -1,10 +1,11 @@
+import {magnifierPlacement,paintMagnifier} from './magnifier.mjs?v=8';
 import {filterPixels} from './model.mjs?v=3';
 import {clamp,fullQuad,quadHandles,quadHit,dragQuad,quadMatrix,project,rectifyPixels,zoomAt,pinchView} from './perspective.mjs?v=7';
 
 export function imageEditor({dialog,canvas,onSave,onError}){
  let base,working,quad=fullQuad(),mode='colour',drag=null,record=null,filterCache=null,geometry=null,view={zoom:1,panX:0,panY:0},pinch=null,frame=null,previewing=false,previewCache=null,previewSource=null,previewQuad='';
- const pointers=new Map(),$=id=>document.getElementById(id),ctx=canvas.getContext('2d');
- const resetView=()=>{view={zoom:1,panX:0,panY:0};pointers.clear();pinch=null;drag=null;};
+ const pointers=new Map(),$=id=>document.getElementById(id),ctx=canvas.getContext('2d'),lens=$('crop-magnifier');
+ const resetView=()=>{lens.hidden=true;view={zoom:1,panX:0,panY:0};pointers.clear();pinch=null;drag=null;};
  function defaults(){quad=fullQuad();resetView();previewing=false;previewCache=null;updateEditorMode();mode='colour';$('brightness').value=100;$('contrast').value=100;$('threshold').value=155;updateModes();}
  function updateModes(){document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));$('threshold-wrap').hidden=mode!=='bw';filterCache=null;}
  function filtered(){
@@ -18,7 +19,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
  function updateEditorMode(){
   $('crop-adjust').ariaPressed=String(!previewing);$('crop-preview').ariaPressed=String(previewing);
   $('crop-adjust').classList.toggle('active',!previewing);$('crop-preview').classList.toggle('active',previewing);
-  $('crop-instructions').textContent=previewing?'Straightened preview — check the result before saving. Pinch or use + / − to inspect it. Switch to Adjust corners to refine the outline.':'Pinch to zoom. Drag each numbered corner onto the receipt. Drag the image to pan when zoomed. Preview straightens the outline before you save.';
+  $('crop-instructions').textContent=previewing?'Straightened preview — check the result before saving. Pinch or use + / − to inspect it. Switch to Adjust corners to refine the outline.':'Pinch to zoom. Drag each numbered corner onto the receipt; the magnifier helps you aim. Drag the image to pan when zoomed. Preview straightens the outline before you save.';
  }
  function correctedImage(maxDimension){
   const source=filtered().getContext('2d').getImageData(0,0,working.width,working.height),result=rectifyPixels(source,quad,maxDimension),out=document.createElement('canvas');out.width=result.width;out.height=result.height;out.getContext('2d').putImageData(new ImageData(result.data,result.width,result.height),0,0);
@@ -35,9 +36,21 @@ export function imageEditor({dialog,canvas,onSave,onError}){
  }
  function changeEditorMode(value){previewing=value;resetView();updateEditorMode();draw();}
  $('crop-adjust').onclick=()=>changeEditorMode(false);$('crop-preview').onclick=()=>changeEditorMode(true);
+
+ function updateMagnifier(){
+  if(!dialog.open||previewing||!drag||typeof drag.type!=='number'||pointers.size!==1){lens.hidden=true;return;}
+  const pointer=pointers.get(drag.id);if(!pointer){lens.hidden=true;return;}
+  const r=canvas.getBoundingClientRect(),modal=dialog.getBoundingClientRect(),size=Math.min(124,innerWidth*.34);
+  const point={x:r.left+pointer.x*r.width/geometry.width,y:r.top+pointer.y*r.height/geometry.height};
+  const bounds={left:Math.max(0,modal.left),top:Math.max(0,modal.top),right:Math.min(innerWidth,modal.right),bottom:Math.min(innerHeight,modal.bottom)};
+  const position=magnifierPlacement(point,bounds,size);
+  lens.style.width=size+'px';lens.style.height=size+'px';lens.style.left=position.left+'px';lens.style.top=position.top+'px';
+  paintMagnifier(lens,filtered(),quad[drag.type],Math.max(1.5,geometry.w/working.width*3),size,window.devicePixelRatio||1);
+  lens.hidden=false;
+ }
  function schedule(){if(frame===null)frame=requestAnimationFrame(()=>{frame=null;draw();});}
  function draw(){
-  if(!working||!dialog.open)return;
+  if(!working||!dialog.open){lens.hidden=true;return;}
   const displayed=previewing?previewImage():filtered();
   const width=Math.max(100,canvas.parentElement.clientWidth),height=Math.max(200,Math.min(450,innerHeight*.46)),scale=Math.min((width-64)/displayed.width,(height-64)/displayed.height),baseW=displayed.width*scale,baseH=displayed.height*scale;
   // Panning can bring any zoomed corner into view without losing the image.
@@ -49,7 +62,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
   if(canvas.width!==rw||canvas.height!==rh){canvas.width=rw;canvas.height=rh;}
   canvas.style.width=width+'px';canvas.style.height=height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.fillStyle='#192a25';ctx.fillRect(0,0,width,height);ctx.drawImage(displayed,x,y,w,h);
-  updateZoomControls();if(previewing)return;
+  updateZoomControls();if(previewing){lens.hidden=true;return;}
   const screen=p=>({x:x+p.x*w,y:y+p.y*h}),corners=quad.map(screen);
   ctx.beginPath();ctx.rect(0,0,width,height);ctx.moveTo(corners[0].x,corners[0].y);for(const p of corners.slice(1))ctx.lineTo(p.x,p.y);ctx.closePath();ctx.fillStyle='#061c17a6';ctx.fill('evenodd');
   ctx.beginPath();ctx.moveTo(corners[0].x,corners[0].y);for(const p of corners.slice(1))ctx.lineTo(p.x,p.y);ctx.closePath();ctx.strokeStyle='#b4f6cc';ctx.lineWidth=2;ctx.stroke();
@@ -61,11 +74,12 @@ export function imageEditor({dialog,canvas,onSave,onError}){
    ctx.beginPath();ctx.arc(p.x,p.y,isCorner?12:8,0,Math.PI*2);ctx.fillStyle=selected?'#b4f6cc':'#fff';ctx.fill();ctx.strokeStyle='#17685b';ctx.lineWidth=2;ctx.stroke();
    if(isCorner){ctx.fillStyle='#17685b';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(handle.type+1),p.x,p.y);}
   }
+  updateMagnifier();
  }
  function screenPoint(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*geometry.width/r.width,y:(e.clientY-r.top)*geometry.height/r.height};}
  const imagePoint=p=>({x:(p.x-geometry.x)/geometry.w,y:(p.y-geometry.y)/geometry.h});
  function startPinch(){
-  const [a,b]=[...pointers.values()];drag=null;
+  const [a,b]=[...pointers.values()];drag=null;lens.hidden=true;
   pinch={view:{...view},geometry:{...geometry},mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},distance:Math.hypot(a.x-b.x,a.y-b.y)};
  }
  canvas.onpointerdown=e=>{
@@ -87,7 +101,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
   schedule();
  };
  function finish(e){
-  if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);drag=null;pinch=null;
+  if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);drag=null;pinch=null;lens.hidden=true;
   if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
   // Wait for the remaining finger to lift, so ending a pinch never moves a corner.
   if(pointers.size>=2)startPinch();schedule();
@@ -102,7 +116,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
  $('reset-image').onclick=()=>{working=base;defaults();draw();};
  $('rotate').onclick=()=>{const c=document.createElement('canvas');c.width=working.height;c.height=working.width;const x=c.getContext('2d');x.translate(c.width,0);x.rotate(Math.PI/2);x.drawImage(working,0,0);working=c;quad=fullQuad();resetView();filterCache=null;draw();};
  $('close-image').onclick=()=>dialog.close();
- dialog.addEventListener('close',()=>{pointers.clear();drag=null;pinch=null;});
+ dialog.addEventListener('close',()=>{pointers.clear();drag=null;pinch=null;lens.hidden=true;});
  $('save-image').onclick=async()=>{
   const button=$('save-image');button.disabled=true;button.textContent='Straightening…';
   try{
