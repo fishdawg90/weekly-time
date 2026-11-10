@@ -1,0 +1,5 @@
+PDF.js 6.5.438, distributed by Mozilla as pdfjs-dist on npm.
+https://github.com/mozilla/pdf.js
+https://www.npmjs.com/package/pdfjs-dist/v/6.5.438
+Core/worker: legacy minified distribution. Supporting fonts/wasm retain their original license files. See LICENSE and licenses in subdirectories.
+Used locally to display receipt PDFs; no receipt data is sent to Mozilla or any other service.

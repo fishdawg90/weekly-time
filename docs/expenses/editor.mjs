@@ -1,4 +1,4 @@
-import {cropRect,filterPixels} from './model.mjs?v=2';
+import {cropRect,filterPixels} from './model.mjs?v=3';
 export function imageEditor({dialog,canvas,onSave,onError}){let base,working,crop,mode='colour',drag=null,record=null,filterCache=null;const $=id=>document.getElementById(id);const ctx=canvas.getContext('2d');
  function defaults(){crop={x:0,y:0,w:1,h:1};mode='colour';$('brightness').value=100;$('contrast').value=100;$('threshold').value=155;updateModes();}
  function updateModes(){document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));$('threshold-wrap').hidden=mode!=='bw';filterCache=null;}

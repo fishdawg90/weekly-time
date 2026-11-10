@@ -1,4 +1,4 @@
-import {oracleTSV,sums,ready} from './model.mjs?v=2';
+import {oracleTSV,sums,ready} from './model.mjs?v=3';
 const enc=new TextEncoder();
 export const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const safeName=s=>(String(s).replace(/[^a-zA-Z0-9._-]/g,'_').slice(0,70)||'expense');
