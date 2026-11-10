@@ -64,7 +64,7 @@
    <details class="receipt-options"><summary>Receipt options</summary><div class="inline-actions"><button id="attach-btn" class="text-btn">Attach file</button><button id="zoom-out" class="icon" aria-label="Zoom receipt out">−</button><button id="zoom-in" class="icon" aria-label="Zoom receipt in">＋</button><a id="open-evidence" class="text-btn" target="_blank" rel="noopener" hidden>Open PDF ↗</a><a id="download-evidence" class="text-btn" download>Download original</a></div></details>
    <input id="attach" type="file" accept="image/*,application/pdf" multiple hidden>
   </div>
-  <form id="item-form" class="details-pane">
+  <form id="item-form" class="details-pane" novalidate>
    <div class="field-pair"><label>Date<input name="date" type="date"></label><label>Amount<div class="money-input"><input name="amount" aria-label="Amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00"><input name="currency" aria-label="Currency" list="currencies" maxlength="3" autocomplete="off" autocapitalize="characters"></div></label></div>
    <label>Reference<select name="reference" id="reference-select"></select></label>
    <label>Description<input name="description" maxlength="500" placeholder="Description"></label>
@@ -74,7 +74,7 @@
     <label class="check"><input name="noReceipt" type="checkbox"> No receipt / evidence not required</label>
     <div class="inline-actions"><button type="button" id="add-reference" class="text-btn">Add Oracle reference</button><button type="button" id="remove-item" class="text-btn danger">Delete expense</button></div>
    </details>
-   <div class="form-finish"><p id="item-missing" class="requirement"></p><button type="submit" class="btn primary">Done &amp; next</button></div>
+   <div class="form-finish"><p id="item-missing" class="requirement"></p><button id="finish-item" type="submit" class="btn primary">Done</button></div>
   </form>
  </div>
 </dialog>
@@ -115,5 +115,5 @@
  <details class="more-details"><summary>Storage &amp; offline</summary><p id="storage-info" class="small muted"></p><button id="persist" class="text-btn">Protect local storage</button><p class="small muted">Install from your browser's menu. Open once online to prepare offline use.</p><button id="install" class="btn" hidden>Install Expenses</button></details>
  <a class="text-btn settings-link" href="../">Open Weekly Time ↗</a>
 </dialog>
-<script type="module" src="./app.mjs?v=9"></script>
+<script type="module" src="./app.mjs?v=10"></script>
 </body></html>

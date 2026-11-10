@@ -85,14 +85,22 @@ function formData(){const i=currentItem();if(!i)return;const form=$('item-form')
  if(i.noReceipt!==form.elements.noReceipt.checked)changed=true;i.noReceipt=form.elements.noReceipt.checked;i.groupId=form.elements.groupId.value;
  if(changed)i.reviewed=false;if(changed||previousGroup!==i.groupId){const g=state.groups.find(g=>g.id===i.groupId);if(g)g.claimed=false;const old=state.groups.find(g=>g.id===previousGroup);if(old&&previousGroup!==i.groupId)old.claimed=false;}
 }
-function requirements(){const i=currentItem();if(!i)return;const m=missing(i);$('item-missing').textContent=m.length?'Missing: '+m.join(', '):ready(i)?'Ready to claim':'Check the receipt, then mark done.';$('item-missing').classList.toggle('complete',!m.length);}
+function requirements(){const i=currentItem();if(!i)return;const m=missing(i);$('item-missing').textContent=m.length?'Draft · missing '+m.join(', '):ready(i)?'Ready to claim':'Check the receipt, then mark done.';$('item-missing').classList.toggle('complete',!m.length);}
 async function flush(){clearTimeout(saveTimer);if(dirty){formData();dirty=false;await persist();}await serial;}
 $('item-form').oninput=()=>{dirty=true;formData();requirements();clearTimeout(saveTimer);saveTimer=setTimeout(()=>flush().catch(fail),600);};
 async function openItem(id){if($('item-dialog').open)await flush();itemId=id;dirty=false;const i=currentItem();$('item-title').textContent=i.description||'Expense';const is=itemsFor(i.groupId);$('item-counter').textContent=`${state.groups.find(g=>g.id===i.groupId).name} · ${is.indexOf(i)+1} / ${is.length}`;const form=$('item-form');fillGroups($('item-group'),i.groupId);$('reference-select').replaceChildren(new Option('Choose…',''),...state.categories.map(c=>new Option(c,c)));if(i.reference&&!state.categories.includes(i.reference))$('reference-select').add(new Option(i.reference,i.reference));for(const k of ['date','amount','currency','reference','description','text','groupId'])form.elements[k].value=i[k]||'';form.elements.noReceipt.checked=!!i.noReceipt;$('item-extras').open=false;for(const d of document.querySelectorAll('.receipt-options'))d.open=false;requirements();if(!$('item-dialog').open)dialog('item-dialog');await renderEvidence();}
 async function closeItem(){await flush();pdf.close();$('item-dialog').close();redraw();}
 $('new-item-group').onclick=action(async()=>{await flush();groupDialog(null,'item');});
 $('close-item').onclick=action(closeItem);$('item-dialog').addEventListener('cancel',e=>{e.preventDefault();closeItem().catch(fail);});
-$('item-form').onsubmit=action(async e=>{e.preventDefault();await flush();const i=currentItem();if(missing(i).length){requirements();toast('Fill the missing details before marking this expense checked.');return;}i.reviewed=true;await persist();const is=itemsFor(i.groupId),next=is.find(x=>!ready(x));if(next){toast('Expense saved.');await openItem(next.id);}else{await closeItem();showGroup(i.groupId);toast('Group ready to claim.');}});
+$('item-form').onsubmit=action(async e=>{
+ e.preventDefault();const button=$('finish-item');if(button.disabled)return;button.disabled=true;
+ try{
+  await flush();formData();const i=currentItem(),absent=missing(i);i.reviewed=absent.length===0;
+  await persist();await closeItem();showGroup(i.groupId);
+  toast(absent.length?'Draft saved · missing '+absent.join(', '):itemsFor(i.groupId).every(ready)?'Group ready to claim.':'Expense saved.');
+ }catch(error){$('item-missing').textContent='Could not save. Please try again.';throw error;}
+ finally{button.disabled=false;}
+});
 $('complete-group').onclick=action(async()=>{const i=itemsFor(groupId).find(i=>!ready(i));if(i)await openItem(i.id);});
 async function deleteExpense(i){await flush();const reviewed=i.reviewed;i.deleted=true;i.reviewed=false;state.groups.find(g=>g.id===i.groupId).claimed=false;await persist();if(itemId===i.id&&$('item-dialog').open){pdf.close();$('item-dialog').close();}redraw();toast('Expense deleted.',async()=>{i.deleted=false;i.reviewed=reviewed;await persist();redraw();});}
 $('remove-item').onclick=action(()=>deleteExpense(currentItem()));
