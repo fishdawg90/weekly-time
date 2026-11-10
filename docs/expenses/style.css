@@ -13,3 +13,10 @@
 #crop-canvas{max-width:100%;cursor:crosshair}
 @media(max-width:500px){.capture-choices{grid-template-columns:repeat(2,minmax(0,1fr))}.capture-choices button{padding:15px 8px}.capture-choices small{font-size:10px}.image-dialog{max-height:97dvh}.image-dialog .dialog-title{margin-bottom:14px}}
 @media(prefers-reduced-motion:reduce){.expense-swipe .expense-row{transition:none!important}}
+
+.crop-zoom-controls{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0}
+.crop-zoom-controls .btn{min-width:44px;min-height:44px;padding:7px 12px}
+#crop-zoom-level{font-size:12px;font-variant-numeric:tabular-nums;min-width:42px;text-align:center}
+#crop-canvas{touch-action:none}
+.image-dialog .crop-buttons{margin-top:7px}
+.image-dialog .small{line-height:1.5}
