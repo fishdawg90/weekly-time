@@ -106,8 +106,8 @@
 
 <dialog id="pack-dialog">
  <div class="dialog-title"><h2>Export group</h2><button class="icon" data-close aria-label="Close export">×</button></div>
- <p id="pack-summary" class="small"></p><p class="small muted">ZIP includes the summary, receipts and a backup. Import restore.json on another device to continue there.</p>
- <div class="actions"><button id="build-pack" class="btn primary">Build ZIP</button><button id="share-pack" class="btn" hidden>Share ↗</button><a id="download-pack" class="btn" hidden download>Download ZIP</a></div><p id="pack-status" role="status" class="small"></p>
+ <p id="pack-summary" class="small"></p><p class="small muted">Share sends the receipts, summary and Oracle text as email attachments. Download ZIP keeps everything together, including a full backup.</p>
+ <div class="actions"><button id="build-pack" class="btn primary">Build pack</button><button id="share-pack" class="btn" hidden>Share to email ↗</button><a id="download-pack" class="btn" hidden download>Download ZIP</a></div><p id="pack-status" role="status" class="small"></p>
  <details class="more-details"><summary>Oracle tools</summary><label>Expenses for Oracle<textarea id="oracle-text" readonly rows="5"></textarea></label><div class="inline-actions"><button id="copy-oracle" class="text-btn">Copy table</button></div><p class="small muted">Standard TSV: Evidence, Date, Receipt Amount, Expense Type, Justification, Receipt Currency. Dates use YYYY-MM-DD; amounts use two decimal places. The ZIP also includes oracle-expenses.json for the future bookmarklet.</p></details>
  <details id="mileage-export" class="more-details" hidden><summary>Mileage for Oracle</summary><label>Mileage only<textarea id="mileage-text" readonly rows="5"></textarea></label><button id="copy-mileage" class="text-btn">Copy mileage</button><p class="small muted">Separate from receipt expenses. One row per leg, at £0.25 per mile. Keep this text for the mileage bookmarklet; mileage stays separate from receipt expenses.</p></details>
 </dialog>
@@ -126,5 +126,5 @@
  <details class="more-details"><summary>Storage &amp; offline</summary><p id="storage-info" class="small muted"></p><button id="persist" class="text-btn">Protect local storage</button><p class="small muted">Install from your browser's menu. Open once online to prepare offline use.</p><button id="install" class="btn" hidden>Install Expenses</button></details>
  <a class="text-btn settings-link" href="../">Open Weekly Time ↗</a>
 </dialog>
-<script type="module" src="./app.mjs?v=14"></script>
+<script type="module" src="./app.mjs?v=15"></script>
 </body></html>
