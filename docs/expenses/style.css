@@ -197,3 +197,6 @@ input[type=date]{padding-left:6px;padding-right:6px}
 .mileage-item input[readonly]{background:var(--bg);color:var(--muted)}
 #mileage-text{white-space:pre;overflow:auto}
 @media(max-width:360px){.mileage-item #item-form>.field-pair{grid-template-columns:minmax(0,1fr)}}
+
+.money-input input[name="amount"]{border-radius:6px;width:100%}
+#item-form>.field-pair:nth-of-type(2){grid-template-columns:minmax(0,1.6fr) minmax(96px,.7fr)}

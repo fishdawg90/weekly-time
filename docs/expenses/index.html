@@ -8,7 +8,7 @@
 <title>Expenses</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./style.css?v=11">
+<link rel="stylesheet" href="./style.css?v=13">
 </head>
 <body>
 <header><a class="brand" href="./">Expenses</a><div class="head-actions"><span id="connection" class="small muted" role="status" hidden></span><span id="save-state" class="small muted" role="status"></span><button id="settings" class="icon" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="white"/><circle cx="15" cy="17" r="3" fill="white"/></svg></button></div></header>
@@ -74,21 +74,21 @@
     <div class="field-pair"><label>Miles<input name="journeyMiles" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0"></label><div class="mileage-rate"><span>25p per mile</span><button type="button" id="round-miles" class="text-btn">Round up</button></div></div>
     <p class="small muted">One leg per item. Check the route, then enter or adjust the miles.</p>
    </fieldset>
-   <div class="field-pair"><label>Date<input name="date" type="date"></label><label>Amount<div class="money-input"><input name="amount" aria-label="Amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00"><input name="currency" aria-label="Currency" list="currencies" maxlength="3" autocomplete="off" autocapitalize="characters"></div></label></div>
-   <label>Reference<select name="reference" id="reference-select"></select></label>
-   <label>Description<input name="description" maxlength="500" placeholder="Description"></label>
+   <div class="field-pair"><label>Date<input name="date" type="date"></label><label><span id="amount-label">Receipt amount</span><div class="money-input"><input name="amount" aria-label="Receipt amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00"></div></label></div>
+   <div class="field-pair"><label>Expense type<select name="reference" id="reference-select"></select></label><label>Receipt currency<select name="currency" aria-label="Receipt currency"><option>GBP</option><option>EUR</option></select></label></div>
+   <label>Justification<input name="description" maxlength="500" placeholder="Business reason for this expense"></label>
    <details id="item-extras" class="more-details"><summary>More details</summary>
     <div class="group-field"><label>Group<select name="groupId" id="item-group"></select></label><button type="button" id="new-item-group" class="text-btn">＋ New</button></div>
     <label>Email / SMS / receipt text<textarea name="text" rows="3" placeholder="Paste text"></textarea></label>
     <label class="check"><input name="noReceipt" type="checkbox"> No receipt / evidence not required</label>
-    <div class="inline-actions"><button type="button" id="add-reference" class="text-btn">Add Oracle reference</button><button type="button" id="remove-item" class="text-btn danger">Delete expense</button></div>
+    <div class="inline-actions"><button type="button" id="remove-item" class="text-btn danger">Delete expense</button></div>
    </details>
    <button id="return-leg" type="button" class="text-btn" hidden>＋ Add return leg</button>
    <div class="form-finish"><p id="item-missing" class="requirement"></p><button id="finish-item" type="submit" class="btn primary">Done</button></div>
   </form>
  </div>
 </dialog>
-<datalist id="currencies"><option>GBP</option><option>EUR</option><option>USD</option><option>CHF</option><option>AED</option></datalist>
+
 
 <dialog id="image-dialog" class="image-dialog">
  <div class="dialog-title"><h2>Edit receipt</h2><button id="close-image" class="icon" aria-label="Close image editor">×</button></div>
@@ -108,8 +108,8 @@
  <div class="dialog-title"><h2>Export group</h2><button class="icon" data-close aria-label="Close export">×</button></div>
  <p id="pack-summary" class="small"></p><p class="small muted">ZIP includes the summary, receipts and a backup. Import restore.json on another device to continue there.</p>
  <div class="actions"><button id="build-pack" class="btn primary">Build ZIP</button><button id="share-pack" class="btn" hidden>Share ↗</button><a id="download-pack" class="btn" hidden download>Download ZIP</a></div><p id="pack-status" role="status" class="small"></p>
- <details class="more-details"><summary>Oracle tools</summary><label>Expenses for Oracle<textarea id="oracle-text" readonly rows="5"></textarea></label><div class="inline-actions"><button id="copy-oracle" class="text-btn">Copy table</button><a id="expense-bookmark" class="text-btn" draggable="true" href="#">Fill Oracle expenses ↗</a></div><p class="small muted">On your work PC, drag “Fill Oracle expenses” to your bookmarks bar and calibrate it on Oracle. Project allocation is manual.</p></details>
- <details id="mileage-export" class="more-details" hidden><summary>Mileage for Oracle</summary><label>Mileage only<textarea id="mileage-text" readonly rows="5"></textarea></label><button id="copy-mileage" class="text-btn">Copy mileage</button><p class="small muted">Separate from receipt expenses. One row per leg, at £0.25 per mile. Keep this text for the mileage bookmarklet; the expenses bookmarklet does not fill mileage.</p></details>
+ <details class="more-details"><summary>Oracle tools</summary><label>Expenses for Oracle<textarea id="oracle-text" readonly rows="5"></textarea></label><div class="inline-actions"><button id="copy-oracle" class="text-btn">Copy table</button></div><p class="small muted">Standard TSV: Evidence, Date, Receipt Amount, Expense Type, Justification, Receipt Currency. Dates use YYYY-MM-DD; amounts use two decimal places. The ZIP also includes oracle-expenses.json for the future bookmarklet.</p></details>
+ <details id="mileage-export" class="more-details" hidden><summary>Mileage for Oracle</summary><label>Mileage only<textarea id="mileage-text" readonly rows="5"></textarea></label><button id="copy-mileage" class="text-btn">Copy mileage</button><p class="small muted">Separate from receipt expenses. One row per leg, at £0.25 per mile. Keep this text for the mileage bookmarklet; mileage stays separate from receipt expenses.</p></details>
 </dialog>
 <dialog id="move-dialog">
  <div class="dialog-title"><h2>Move expenses</h2><button class="icon" data-close aria-label="Close move expenses">×</button></div>
@@ -126,5 +126,5 @@
  <details class="more-details"><summary>Storage &amp; offline</summary><p id="storage-info" class="small muted"></p><button id="persist" class="text-btn">Protect local storage</button><p class="small muted">Install from your browser's menu. Open once online to prepare offline use.</p><button id="install" class="btn" hidden>Install Expenses</button></details>
  <a class="text-btn settings-link" href="../">Open Weekly Time ↗</a>
 </dialog>
-<script type="module" src="./app.mjs?v=12"></script>
+<script type="module" src="./app.mjs?v=13"></script>
 </body></html>
