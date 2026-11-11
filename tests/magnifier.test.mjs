@@ -17,7 +17,8 @@ test('the crosshair centre samples the actual image corner at high resolution',(
  const canvas={getContext:()=>ctx},source={width:2000,height:3000},point={x:.2,y:.3};
  paintMagnifier(canvas,source,point,2,124,2);
  assert.equal(canvas.width,248);assert.equal(canvas.height,248);
- const [image,x,y,w,h]=draws[0];assert.equal(image,source);
- assert.equal(x+point.x*w,62);assert.equal(y+point.y*h,62);
+ const [image,sx,sy,sw,sh,dx,dy,dw,dh]=draws[0];assert.equal(image,source);
+ assert(sw<100&&sh<100,'only a small source patch is drawn');
+ assert.equal(dx+(point.x*source.width-sx)*dw/sw,62);assert.equal(dy+(point.y*source.height-sy)*dh/sh,62);
  assert(moves.some(([x,y])=>x===56&&y===62));assert(moves.some(([x,y])=>x===62&&y===56));
 });

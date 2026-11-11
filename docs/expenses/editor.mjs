@@ -1,9 +1,10 @@
-import {magnifierPlacement,paintMagnifier} from './magnifier.mjs?v=8';
+import {detectReceipt} from './receipt-edges.mjs?v=12';
+import {magnifierPlacement,paintMagnifier} from './magnifier.mjs?v=12';
 import {filterPixels} from './model.mjs?v=3';
 import {clamp,fullQuad,quadHandles,quadHit,dragQuad,quadMatrix,project,rectifyPixels,zoomAt,pinchView} from './perspective.mjs?v=7';
 
 export function imageEditor({dialog,canvas,onSave,onError}){
- let base,working,quad=fullQuad(),mode='colour',drag=null,record=null,filterCache=null,geometry=null,view={zoom:1,panX:0,panY:0},pinch=null,frame=null,previewing=false,previewCache=null,previewSource=null,previewQuad='';
+ let base,working,quad=fullQuad(),mode='colour',drag=null,record=null,filterCache=null,geometry=null,view={zoom:1,panX:0,panY:0},pinch=null,frame=null,previewing=false,previewCache=null,previewSource=null,previewQuad='',displayCache=null,displaySource=null,openGeneration=0;
  const pointers=new Map(),$=id=>document.getElementById(id),ctx=canvas.getContext('2d'),lens=$('crop-magnifier');
  const resetView=()=>{lens.hidden=true;view={zoom:1,panX:0,panY:0};pointers.clear();pinch=null;drag=null;};
  function defaults(){quad=fullQuad();resetView();previewing=false;previewCache=null;updateEditorMode();mode='colour';$('brightness').value=100;$('contrast').value=100;$('threshold').value=155;updateModes();}
@@ -16,6 +17,23 @@ export function imageEditor({dialog,canvas,onSave,onError}){
   return filterCache=c;
  }
 
+ function displayImage(){const source=filtered();if(source!==displaySource){displaySource=source;displayCache=document.createElement('canvas');const scale=Math.min(1,1400/Math.max(source.width,source.height));displayCache.width=Math.round(source.width*scale);displayCache.height=Math.round(source.height*scale);displayCache.getContext('2d').drawImage(source,0,0,displayCache.width,displayCache.height);}return displayCache;}
+ async function findEdges(){
+  const generation=openGeneration,source=working,previous=quad;const button=$('detect-edges');button.disabled=true;
+  $('crop-instructions').textContent='Finding receipt edges…';
+  try{
+   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   if(!dialog.open||generation!==openGeneration)return;
+   const sample=document.createElement('canvas'),scale=Math.min(1,480/Math.max(source.width,source.height));sample.width=Math.round(source.width*scale);sample.height=Math.round(source.height*scale);
+   const x=sample.getContext('2d',{willReadFrequently:true});x.drawImage(source,0,0,sample.width,sample.height);
+   const found=detectReceipt(x.getImageData(0,0,sample.width,sample.height));
+   if(generation!==openGeneration||source!==working||quad!==previous||pointers.size)return;
+   if(found){quad=found;resetView();previewCache=null;updateEditorMode();$('crop-instructions').textContent='Edges estimated · Adjust corners to check';}
+   else{updateEditorMode();$('crop-instructions').textContent='No clear outline · Drag corners to crop';}
+   draw();
+  }catch{updateEditorMode();}finally{button.disabled=false;}
+ }
+ $('detect-edges').onclick=()=>{if(previewing)changeEditorMode(false);findEdges();};
  function updateEditorMode(){
   $('crop-adjust').ariaPressed=String(!previewing);$('crop-preview').ariaPressed=String(previewing);
   $('crop-adjust').classList.toggle('active',!previewing);$('crop-preview').classList.toggle('active',previewing);
@@ -51,7 +69,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
  function schedule(){if(frame===null)frame=requestAnimationFrame(()=>{frame=null;draw();});}
  function draw(){
   if(!working||!dialog.open){lens.hidden=true;return;}
-  const displayed=previewing?previewImage():filtered();
+  const displayed=previewing?previewImage():displayImage();
   const width=Math.max(100,canvas.parentElement.clientWidth),height=Math.max(200,Math.min(450,innerHeight*.46)),scale=Math.min((width-64)/displayed.width,(height-64)/displayed.height),baseW=displayed.width*scale,baseH=displayed.height*scale;
   // Panning can bring any zoomed corner into view without losing the image.
   view.panX=clamp(view.panX,-baseW*(view.zoom-1)/2,baseW*(view.zoom-1)/2);
@@ -88,7 +106,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
   if(pointers.size>=2){startPinch();schedule();return;}
   const point=imagePoint(p),hit=previewing?null:quadHit(quad,point,geometry.w,geometry.h);
   const type=hit===null||hit==='move'&&view.zoom>1?'pan':hit;
-  drag={type,point,start:quad.map(p=>({...p})),screen:p,view:{...view},id:e.pointerId};schedule();
+  drag={type,point,start:quad.map(p=>({...p})),screen:p,view:{...view},id:e.pointerId};draw();
  };
  canvas.onpointermove=e=>{
   if(!geometry)return;const p=screenPoint(e);
@@ -97,7 +115,7 @@ export function imageEditor({dialog,canvas,onSave,onError}){
   if(pointers.size>=2&&pinch){const [a,b]=[...pointers.values()];view=pinchView(pinch,pinch.geometry,a,b);schedule();return;}
   if(!drag||e.pointerId!==drag.id)return;
   if(drag.type==='pan'){view={...drag.view,panX:drag.view.panX+p.x-drag.screen.x,panY:drag.view.panY+p.y-drag.screen.y};}
-  else{const point=imagePoint(p);quad=dragQuad(drag.start,drag.type,point.x-drag.point.x,point.y-drag.point.y,quad);}
+  else{const point=imagePoint(p);quad=dragQuad(quad,drag.type,point.x-drag.point.x,point.y-drag.point.y,quad);drag.point=point;}
   schedule();
  };
  function finish(e){
@@ -129,9 +147,9 @@ export function imageEditor({dialog,canvas,onSave,onError}){
  };
  new ResizeObserver(()=>{if(pointers.size){pointers.clear();pinch=null;drag=null;}schedule();}).observe(canvas.parentElement);
  return async f=>{
-  record=f;
+  record=f;openGeneration++;
   try{
-   const bitmap=await createImageBitmap(f.original,{imageOrientation:'from-image'}),scale=Math.min(1,2400/Math.max(bitmap.width,bitmap.height));base=document.createElement('canvas');base.width=Math.round(bitmap.width*scale);base.height=Math.round(bitmap.height*scale);base.getContext('2d').drawImage(bitmap,0,0,base.width,base.height);bitmap.close();working=base;defaults();dialog.showModal();draw();
+   const bitmap=await createImageBitmap(f.original,{imageOrientation:'from-image'}),scale=Math.min(1,2400/Math.max(bitmap.width,bitmap.height));base=document.createElement('canvas');base.width=Math.round(bitmap.width*scale);base.height=Math.round(bitmap.height*scale);base.getContext('2d').drawImage(bitmap,0,0,base.width,base.height);bitmap.close();working=base;defaults();dialog.showModal();draw();await findEdges();
   }catch(e){onError(Error('This image format cannot be edited here. The original is saved. Try a JPEG or PNG.'));}
  };
 }

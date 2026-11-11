@@ -17,7 +17,10 @@ export function paintMagnifier(canvas,source,point,scale,size=124,dpr=1){
  ctx.fillStyle='#192a25';ctx.fillRect(0,0,size,size);
  // Sample the image itself; never magnify the crop handles or the finger.
  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.drawImage(source,centre-point.x*source.width*scale,centre-point.y*source.height*scale,source.width*scale,source.height*scale);
+ // Draw only the small source patch visible through the lens.
+ const span=size/scale,sx=point.x*source.width-span/2,sy=point.y*source.height-span/2;
+ const left=Math.max(0,sx),top=Math.max(0,sy),right=Math.min(source.width,sx+span),bottom=Math.min(source.height,sy+span);
+ if(right>left&&bottom>top)ctx.drawImage(source,left,top,right-left,bottom-top,(left-sx)*scale,(top-sy)*scale,(right-left)*scale,(bottom-top)*scale);
  const crosshair=()=>{ctx.beginPath();for(const sign of [-1,1]){ctx.moveTo(centre+sign*6,centre);ctx.lineTo(centre+sign*22,centre);ctx.moveTo(centre,centre+sign*6);ctx.lineTo(centre,centre+sign*22);}ctx.stroke();};
  ctx.strokeStyle='#102e25';ctx.lineWidth=4;crosshair();ctx.strokeStyle='#fff';ctx.lineWidth=2;crosshair();
  ctx.beginPath();ctx.arc(centre,centre,2.5,0,Math.PI*2);ctx.fillStyle='#17685b';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();

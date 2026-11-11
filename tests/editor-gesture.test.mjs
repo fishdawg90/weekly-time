@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {imageEditor} from '../docs/expenses/editor.mjs';
 test('second non-primary touch starts pinch and lifting a finger never drags a corner',async()=>{
  const previous=new Map(['document','window','innerHeight','innerWidth','requestAnimationFrame','ResizeObserver','createImageBitmap','ImageData'].map(k=>[k,globalThis[k]]));
- const rendered=[],frames=[],nodes=new Map(),ctx=new Proxy({getImageData:()=>({width:11,height:11,data:new Uint8ClampedArray(11*11*4)}),putImageData:d=>rendered.push(d)}, {get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)}),events={};
+ const arcs=[],rendered=[],frames=[],nodes=new Map(),ctx=new Proxy({arc:(...args)=>arcs.push(args),getImageData:()=>({width:11,height:11,data:new Uint8ClampedArray(11*11*4)}),putImageData:d=>rendered.push(d)}, {get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)}),events={};
  const canvas={parentElement:{clientWidth:400},style:{},getContext:()=>ctx,getBoundingClientRect:()=>({left:0,top:0,width:400,height:368}),setPointerCapture(){},hasPointerCapture:()=>false,addEventListener:(k,fn)=>events[k]=fn};
  const dialog={open:false,showModal(){this.open=true;},getBoundingClientRect:()=>({left:0,top:0,right:400,bottom:800}),addEventListener(){}};
  const get=id=>{if(!nodes.has(id))nodes.set(id,{value:100,classList:{toggle(){}},textContent:'',disabled:false,style:{},getContext:()=>ctx,hidden:true});return nodes.get(id);};
@@ -17,8 +17,14 @@ test('second non-primary touch starts pinch and lifting a finger never drags a c
   globalThis.ResizeObserver=class{observe(){}};
   globalThis.createImageBitmap=async()=>({width:700,height:1100,close(){}});
   const open=imageEditor({dialog,canvas,onSave(){},onError:e=>{throw e;}});
-  await open({original:{}});assert.equal(get('crop-zoom-level').textContent,'100%');
+  const opening=open({original:{}});await Promise.resolve();flush();await opening;assert.equal(get('crop-zoom-level').textContent,'100%');
   assert.equal(get('crop-magnifier').hidden,true);
+  canvas.onpointerdown(pointer(99,104,32));flush();
+  const corner=()=>arcs.filter(a=>a[2]===12).slice(-4)[0];const before=corner();
+  canvas.onpointermove(pointer(99,105,33));flush();assert(Math.abs(corner()[0]-before[0]-1)<.001,'one pixel of finger movement moves the corner immediately');
+  canvas.onpointermove(pointer(99,-100,-100));flush();const clamped=corner();
+  canvas.onpointermove(pointer(99,-99,-99));flush();assert(Math.abs(corner()[0]-clamped[0]-1)<.001,'reversing after hitting the boundary has no dead travel');
+  canvas.onpointerup(pointer(99,-99,-99));get('reset-crop').onclick();
   canvas.onpointerdown(pointer(7,104,32));flush();
   assert.equal(get('crop-magnifier').hidden,false,'corner drag shows the magnifier');
   canvas.onpointermove(pointer(7,125,55));flush();

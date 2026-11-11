@@ -3,7 +3,7 @@ import {inAppBack,backTarget} from './navigation.mjs?v=3';
 import {empty,uid,newItem,active,ready,missing,sums,merge,validate,oracleTSV,moveItems,newMileage,mileageAmount,mileageDescription,mileageTSV,routeURL} from './model.mjs?v=11';
 import {load,write,file,db} from './db.mjs?v=11';
 import {zip,report,safeName,blobBase64,dataBlob} from './pack.mjs?v=11';
-import {imageEditor} from './editor.mjs?v=9';
+import {imageEditor} from './editor.mjs?v=12';
 import {swipeExpense} from './swipe.mjs?v=5';
 import {bookmarkURL} from './oracle-bookmark.mjs?v=3';
 const $=id=>document.getElementById(id),el=(t,c,text)=>{const e=document.createElement(t);if(c)e.className=c;if(text!==undefined)e.textContent=text;return e;};
