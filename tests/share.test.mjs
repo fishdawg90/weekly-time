@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {sharePack} from '../docs/expenses/share.mjs';
+const file={name:'trip.zip',type:'application/zip'};
+test('sharing invokes the native API immediately with just the ZIP',async()=>{let data;const pending=sharePack(file,{canShare:()=>true,share:d=>{data=d;return Promise.resolve();}});assert.deepEqual(data,{files:[file]});assert.equal(await pending,'shared');});
+test('permission denied falls back to download without throwing a storage error',async()=>{assert.equal(await sharePack(file,{canShare:()=>true,share:()=>Promise.reject(Object.assign(Error('Permission denied'),{name:'NotAllowedError'}))}),'download');});
+test('cancelling the share sheet does not trigger a download or report failure',async()=>{assert.equal(await sharePack(file,{canShare:()=>true,share:()=>Promise.reject(Object.assign(Error('Cancelled'),{name:'AbortError'}))}),'cancelled');});
+test('unavailable, unsupported or failed capability checks use download',async()=>{for(const nav of [{},{canShare:()=>false,share:()=>{throw Error('must not invoke');}},{canShare:()=>{throw Error('Unsupported');},share(){}}])assert.equal(await sharePack(file,nav),'download');assert.equal(await sharePack(null,{}),'missing');});
