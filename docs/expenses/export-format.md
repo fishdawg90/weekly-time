@@ -42,4 +42,8 @@ Old Train, Meals and Taxi values map to Rail travel, Travel Meals and Ground Tra
 
 ## Email sharing
 
-Share to email sends normal text, JPEG and PDF attachments, rather than the ZIP (which Chromium web sharing does not permit). The summary is a plain-text file. Oracle TSV stays in `*-oracle.txt`; the versioned JSON is plain text in `*-oracle-expenses.txt`, with identical field names and version. Mileage remains a separate text attachment. Receipt images use the enhanced scan when present and are encoded as JPEG up to 2400 pixels; PDF receipts remain PDFs. The downloadable ZIP retains all originals, edited scans and the full app backup.
+Share to email sends one combined PDF. The PDF contains a summary and all pages of receipt evidence (using enhanced scans where present). PDF input pages are rendered locally at up to 2400 pixels before inclusion; the ZIP still preserves the original PDFs and photos.
+
+The PDF contains a clickable Oracle copy link; the native sharing message also contains that link where the selected email app accepts shared text. `copy.html#...` carries a compressed version-1 snapshot containing separate expenses and mileage TSV strings. No copy data is uploaded or placed in the server query string. Opening the link attempts clipboard copying; a clearly labelled button provides the user gesture browsers may require. The page also exposes the text for manual copying. Only completed/reviewed sections enter the link; draft items remain labelled as drafts in the PDF. The link is a snapshot, not a live reference to phone data. Anyone receiving the link can read its data.
+
+The downloadable ZIP remains the full restore backup. The email has no loose text attachments.
