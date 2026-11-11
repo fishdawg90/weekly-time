@@ -1,4 +1,4 @@
-import {empty,validate} from './model.mjs?v=3';
+import {empty,validate} from './model.mjs?v=11';
 export const DB='weekly-expenses-v1';
 let connection;
 export function db(){return connection||=new Promise((res,rej)=>{const q=indexedDB.open(DB,1);q.onupgradeneeded=()=>{q.result.createObjectStore('meta');q.result.createObjectStore('files',{keyPath:'id'});};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}

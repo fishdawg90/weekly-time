@@ -187,3 +187,13 @@ dialog{max-width:none}
 input[type=date]{padding-left:6px;padding-right:6px}
 .money-input input[type=number]{appearance:textfield;-moz-appearance:textfield}
 .money-input input[type=number]::-webkit-inner-spin-button,.money-input input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* Mileage uses the existing compact expense form without a receipt pane. */
+.mileage-add{width:100%;margin-top:12px}
+#mileage-fields{border:0;padding:0;margin:0 0 14px;min-width:0}
+.mileage-item .receipt-workspace{display:block}
+.mileage-item.workspace{width:min(520px,calc(100vw - 24px))}
+.mileage-rate{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;font-size:13px;color:var(--muted);padding-top:18px}
+.mileage-item input[readonly]{background:var(--bg);color:var(--muted)}
+#mileage-text{white-space:pre;overflow:auto}
+@media(max-width:360px){.mileage-item #item-form>.field-pair{grid-template-columns:minmax(0,1fr)}}
