@@ -1,5 +1,5 @@
 import {imagePDF} from './pdf-writer.mjs?v=16';
-import {ready,sums} from './model.mjs?v=13';
+import {ready,sums} from './model.mjs?v=18';
 const WIDTH=1240,HEIGHT=1754,MARGIN=80;
 function sheet(){const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,WIDTH,HEIGHT);ctx.fillStyle='#24272c';ctx.font='26px system-ui';return {canvas,ctx,links:[]};}
 async function raster(page){const blob=await new Promise((res,rej)=>page.canvas.toBlob(b=>b?res(b):rej(Error('Could not create PDF page.')),'image/jpeg',.94));const bytes=new Uint8Array(await blob.arrayBuffer());page.canvas.width=1;return {bytes,width:WIDTH,height:HEIGHT,links:page.links};}

@@ -9,7 +9,7 @@ Column order:
 | Evidence | evidence | Three-digit group item number, e.g. 001; matches evidence file prefixes. Gaps can occur where mileage items are excluded. |
 | Date | date | ISO date: YYYY-MM-DD. Convert to Oracle's display format in the future bookmarklet. |
 | Receipt Amount | receiptAmount | Decimal string with two decimal places. Original receipt amount; no exchange conversion. |
-| Expense Type | expenseType | Rail travel, Travel Meals, Parking, or Ground Transportation. Exact case and spacing. |
+| Expense Type | expenseType | Rail travel, Travel Meals, Parking, Ground Transportation, or Hotel. Exact case and spacing. |
 | Justification | justification | The business justification entered in the app (previously Description). |
 | Receipt Currency | receiptCurrency | GBP or EUR. Receipt currency is enabled in Oracle. |
 

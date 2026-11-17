@@ -1,4 +1,4 @@
-export const CATEGORIES=['Rail travel','Travel Meals','Parking','Ground Transportation'];
+export const CATEGORIES=['Rail travel','Travel Meals','Parking','Ground Transportation','Hotel'];
 export const CURRENCIES=['GBP','EUR'];
 const LEGACY_TYPES=new Map([['Train','Rail travel'],['Meals','Travel Meals'],['Taxi','Ground Transportation']]);
 export const canonicalType=value=>LEGACY_TYPES.get(value)||value;

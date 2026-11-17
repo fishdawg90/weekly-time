@@ -1,7 +1,7 @@
-import {combinedPDF} from './combined-pdf.mjs?v=16';
+import {combinedPDF} from './combined-pdf.mjs?v=18';
 import {copyLink} from './copy-data.mjs?v=16';
-import {oracleTSV,mileageTSV,ready} from './model.mjs?v=13';
-import {safeName} from './pack.mjs?v=13';
+import {oracleTSV,mileageTSV,ready} from './model.mjs?v=18';
+import {safeName} from './pack.mjs?v=18';
 export async function emailPack(group,items,getFile,render=combinedPDF,base=globalThis.document?.baseURI){
  const receipts=items.filter(i=>!i.mileage),mileage=items.filter(i=>i.mileage);
  const data={v:1,expenses:receipts.length&&receipts.every(ready)?oracleTSV(items):'',mileage:mileage.length&&mileage.every(ready)?mileageTSV(mileage):''};
