@@ -8,13 +8,13 @@
 <title>Expenses</title>
 <link rel="manifest" href="./manifest.webmanifest?identity=1">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./style.css?v=13">
+<link rel="stylesheet" href="./style.css?v=19">
 </head>
 <body>
 <header><a class="brand" href="./">Expenses</a><div class="head-actions"><span id="connection" class="small muted" role="status" hidden></span><span id="save-state" class="small muted" role="status"></span><button id="settings" class="icon" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="white"/><circle cx="15" cy="17" r="3" fill="white"/></svg></button></div></header>
 <main>
 <section id="home">
- <div class="page-heading"><h1>Groups <span id="group-count" class="count"></span></h1><button id="new-group" class="text-btn">＋ New group</button></div>
+ <div class="page-heading"><div class="groups-heading"><h1>Groups <span id="group-count" class="count"></span></h1><p id="all-groups-total" class="groups-total" title="Total expenses across all groups" role="status">Total: £0.00</p></div><button id="new-group" class="text-btn">＋ New group</button></div>
  <div class="list-toolbar"><select id="group-filter" aria-label="Filter groups"><option value="active">Active groups</option><option value="ready">Ready to claim</option><option value="claimed">Claimed</option><option value="all">All groups</option></select></div>
  <div id="groups" class="groups"></div>
  <div class="bottom-dock"><button id="capture-home" class="btn primary">＋ Add expense</button></div>
@@ -126,5 +126,5 @@
  <details class="more-details"><summary>Storage &amp; offline</summary><p id="storage-info" class="small muted"></p><button id="persist" class="text-btn">Protect local storage</button><p class="small muted">Install from your browser's menu. Open once online to prepare offline use.</p><button id="install" class="btn" hidden>Install Expenses</button></details>
  <a class="text-btn settings-link" href="../">Open Weekly Time ↗</a>
 </dialog>
-<script type="module" src="./app.mjs?v=18"></script>
+<script type="module" src="./app.mjs?v=19"></script>
 </body></html>

@@ -40,6 +40,7 @@ function drawHome(){
   info.append(line,meta);row.append(info,el('span','group-chevron','›'));row.onclick=()=>showGroup(g.id);target.append(row);
  }
  $('group-count').textContent=shown||'';
+ $('all-groups-total').textContent='Total: '+(amounts(active(state))||money('GBP',0));
  if(!shown){const box=el('div','empty');box.append(el('h3','',filter==='ready'?'No groups ready':filter==='claimed'?'No claimed groups':'No groups yet'),el('p','',filter==='active'?'Create a group or add an expense.':'Choose another filter to see your groups.'));target.append(box);}
 }
 function drawGroup(){

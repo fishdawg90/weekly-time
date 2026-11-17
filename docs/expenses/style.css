@@ -200,3 +200,8 @@ input[type=date]{padding-left:6px;padding-right:6px}
 
 .money-input input[name="amount"]{border-radius:6px;width:100%}
 #item-form>.field-pair:nth-of-type(2){grid-template-columns:minmax(0,1.6fr) minmax(96px,.7fr)}
+
+.groups-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 16px;min-width:0}
+.groups-heading h1{white-space:nowrap}
+.groups-total{font-size:14px;font-weight:550;font-variant-numeric:tabular-nums;line-height:1.5}
+.page-heading>#new-group{flex-shrink:0}
